@@ -1,8 +1,18 @@
-@@ .. @@
-   "scripts": {
--    "test": "echo \"Error: no test specified\" && exit 1"
-+    "test": "echo \"Error: no test specified\" && exit 1",
-+    "dev": "vite",
-+    "build": "vite build",
-+    "preview": "vite preview"
-   },
+{
+  "name": "radr-countdown",
+  "version": "1.0.0",
+  "description": "Radr Migration Countdown Landing Page",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["countdown", "landing-page", "radr"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
