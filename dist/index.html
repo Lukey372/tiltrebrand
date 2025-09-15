@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$TILT → $RADR Migration | Countdown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" crossorigin href="/assets/index-tsLOwuYN.css">
+</head>
+<body>
+    <div class="background">
+        <div class="gradient-overlay"></div>
+        <div class="glow-orb glow-orb-1"></div>
+        <div class="glow-orb glow-orb-2"></div>
+        <div class="glow-orb glow-orb-3"></div>
+        <div class="radar-pulse"></div>
+    </div>
+
+    <header class="header">
+        <div class="logo">
+            <span class="logo-text">Radr</span>
+        </div>
+        <div class="header-divider"></div>
+    </header>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <h1 class="headline">
+                <span class="token-from">$TILT</span>
+                <span class="arrow">→</span>
+                <span class="token-to">$RADR</span>
+                <span class="migration-text">Migration</span>
+            </h1>
+            
+            <div class="subheadline">
+                <span id="event-description">Opens Sep 23, 2025 • 12:00 PM ET</span>
+            </div>
+
+            <div class="state-indicator">
+                <div class="state-pill" id="state-pill">
+                    <span id="state-text">OPENS IN</span>
+                </div>
+            </div>
+
+            <div class="countdown-container">
+                <div class="countdown-grid">
+                    <div class="countdown-card">
+                        <div class="countdown-number" id="days">00</div>
+                        <div class="countdown-label">DAYS</div>
+                    </div>
+                    <div class="countdown-card">
+                        <div class="countdown-number" id="hours">00</div>
+                        <div class="countdown-label">HOURS</div>
+                    </div>
+                    <div class="countdown-card">
+                        <div class="countdown-number" id="minutes">00</div>
+                        <div class="countdown-label">MINUTES</div>
+                    </div>
+                    <div class="countdown-card">
+                        <div class="countdown-number" id="seconds">00</div>
+                        <div class="countdown-label">SECONDS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-section" id="progress-section" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill">
+                        <div class="progress-shimmer"></div>
+                    </div>
+                </div>
+                <div class="progress-label" id="progress-label">0% of window elapsed</div>
+            </div>
+
+            <div class="cta-section" id="cta-section" style="display: none;">
+                <button class="cta-button">
+                    <span>Start Migration</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="timezone-info">
+            <div class="timezone-line">
+                <span>Migration Window: Sep 23, 2025 12:00 PM ET - Sep 30, 2025 12:00 PM ET</span>
+            </div>
+            <div class="timezone-line local-time">
+                <span id="local-timezone">Local Time: <span id="local-time-display">Loading...</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
