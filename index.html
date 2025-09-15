@@ -93,6 +93,248 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        class CountdownTimer {
+            constructor() {
+                // Migration window dates (Sep 23, 2025 12:00 PM ET to Sep 30, 2025 12:00 PM ET)
+                this.openDate = new Date('2025-09-23T16:00:00.000Z'); // 12:00 PM ET in UTC
+                this.closeDate = new Date('2025-09-30T16:00:00.000Z'); // 12:00 PM ET in UTC
+                
+                this.elements = {
+                    days: document.getElementById('days'),
+                    hours: document.getElementById('hours'),
+                    minutes: document.getElementById('minutes'),
+                    seconds: document.getElementById('seconds'),
+                    statePill: document.getElementById('state-pill'),
+                    stateText: document.getElementById('state-text'),
+                    eventDescription: document.getElementById('event-description'),
+                    progressSection: document.getElementById('progress-section'),
+                    progressFill: document.getElementById('progress-fill'),
+                    progressLabel: document.getElementById('progress-label'),
+                    ctaSection: document.getElementById('cta-section'),
+                    localTimeDisplay: document.getElementById('local-time-display')
+                };
+                
+                this.previousValues = { days: null, hours: null, minutes: null, seconds: null };
+                this.currentState = 'PRE_OPEN';
+                
+                this.init();
+            }
+            
+            init() {
+                this.updateLocalTimezone();
+                this.updateCountdown();
+                this.startTimer();
+            }
+            
+            updateLocalTimezone() {
+                this.updateCurrentTime();
+                // Update time every second
+                setInterval(() => {
+                    this.updateCurrentTime();
+                }, 1000);
+            }
+            
+            updateCurrentTime() {
+                const now = new Date();
+                
+                // Get current UTC time
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                
+                // EST is UTC-5, EDT is UTC-4
+                const year = now.getFullYear();
+                
+                // DST starts second Sunday in March
+                const dstStart = new Date(year, 2, 1);
+                dstStart.setDate(dstStart.getDate() + (7 - dstStart.getDay()) + 7);
+                
+                // DST ends first Sunday in November
+                const dstEnd = new Date(year, 10, 1);
+                dstEnd.setDate(dstEnd.getDate() + (7 - dstEnd.getDay()));
+                
+                const isDST = now >= dstStart && now < dstEnd;
+                const offset = isDST ? -4 : -5; // EDT or EST
+                const estTime = new Date(utc + (offset * 3600000));
+                
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                const dayName = days[estTime.getDay()];
+                const monthName = months[estTime.getMonth()];
+                const date = estTime.getDate();
+                const yearNum = estTime.getFullYear();
+                
+                let hours = estTime.getHours();
+                const minutes = estTime.getMinutes().toString().padStart(2, '0');
+                const seconds = estTime.getSeconds().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                
+                const timezone = isDST ? 'EDT' : 'EST';
+                const formattedTime = `${dayName}, ${monthName} ${date}, ${yearNum}, ${hours}:${minutes}:${seconds} ${ampm} ${timezone}`;
+                
+                if (this.elements.localTimeDisplay) {
+                    this.elements.localTimeDisplay.textContent = formattedTime;
+                }
+            }
+            
+            getCurrentState() {
+                const now = new Date();
+                
+                if (now < this.openDate) {
+                    return 'PRE_OPEN';
+                } else if (now >= this.openDate && now <= this.closeDate) {
+                    return 'OPEN';
+                } else {
+                    return 'CLOSED';
+                }
+            }
+            
+            updateCountdown() {
+                const now = new Date();
+                const state = this.getCurrentState();
+                
+                // Update state if changed
+                if (this.currentState !== state) {
+                    this.currentState = state;
+                    this.updateStateDisplay();
+                }
+                
+                let targetDate;
+                let timeRemaining;
+                
+                switch (state) {
+                    case 'PRE_OPEN':
+                        targetDate = this.openDate;
+                        timeRemaining = targetDate - now;
+                        if (this.elements.eventDescription) {
+                            this.elements.eventDescription.textContent = 'Opens Sep 23, 2025 • 12:00 PM ET';
+                        }
+                        break;
+                        
+                    case 'OPEN':
+                        targetDate = this.closeDate;
+                        timeRemaining = targetDate - now;
+                        if (this.elements.eventDescription) {
+                            this.elements.eventDescription.textContent = 'Closes Sep 30, 2025 • 12:00 PM ET';
+                        }
+                        this.updateProgress();
+                        break;
+                        
+                    case 'CLOSED':
+                        timeRemaining = 0;
+                        if (this.elements.eventDescription) {
+                            this.elements.eventDescription.textContent = 'Migration window has closed';
+                        }
+                        break;
+                }
+                
+                if (timeRemaining > 0) {
+                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                    
+                    this.updateTimeDisplay('days', days);
+                    this.updateTimeDisplay('hours', hours);
+                    this.updateTimeDisplay('minutes', minutes);
+                    this.updateTimeDisplay('seconds', seconds);
+                } else {
+                    this.updateTimeDisplay('days', 0);
+                    this.updateTimeDisplay('hours', 0);
+                    this.updateTimeDisplay('minutes', 0);
+                    this.updateTimeDisplay('seconds', 0);
+                }
+            }
+            
+            updateTimeDisplay(unit, value) {
+                const formattedValue = value.toString().padStart(2, '0');
+                const element = this.elements[unit];
+                
+                if (element && this.previousValues[unit] !== formattedValue) {
+                    element.textContent = formattedValue;
+                    this.previousValues[unit] = formattedValue;
+                }
+            }
+            
+            updateStateDisplay() {
+                const pill = this.elements.statePill;
+                const text = this.elements.stateText;
+                const progressSection = this.elements.progressSection;
+                const ctaSection = this.elements.ctaSection;
+                
+                if (!pill || !text) return;
+                
+                // Remove all state classes
+                pill.classList.remove('open', 'closed');
+                
+                switch (this.currentState) {
+                    case 'PRE_OPEN':
+                        text.textContent = 'OPENS IN';
+                        if (progressSection) progressSection.style.display = 'none';
+                        if (ctaSection) ctaSection.style.display = 'none';
+                        break;
+                        
+                    case 'OPEN':
+                        pill.classList.add('open');
+                        text.textContent = 'OPEN NOW';
+                        if (progressSection) progressSection.style.display = 'block';
+                        if (ctaSection) ctaSection.style.display = 'block';
+                        break;
+                        
+                    case 'CLOSED':
+                        pill.classList.add('closed');
+                        text.textContent = 'CLOSED';
+                        if (progressSection) progressSection.style.display = 'none';
+                        if (ctaSection) ctaSection.style.display = 'none';
+                        break;
+                }
+            }
+            
+            updateProgress() {
+                const now = new Date();
+                const totalDuration = this.closeDate - this.openDate;
+                const elapsed = now - this.openDate;
+                const percentage = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
+                
+                if (this.elements.progressFill) {
+                    this.elements.progressFill.style.width = `${percentage}%`;
+                }
+                if (this.elements.progressLabel) {
+                    this.elements.progressLabel.textContent = `${Math.round(percentage)}% of window elapsed`;
+                }
+            }
+            
+            startTimer() {
+                // Update immediately
+                this.updateCountdown();
+                
+                // Then update every second
+                setInterval(() => {
+                    this.updateCountdown();
+                }, 1000);
+            }
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                new CountdownTimer();
+            });
+        } else {
+            new CountdownTimer();
+        }
+
+        // Add CTA button handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('click', () => {
+                    console.log('Migration button clicked');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
