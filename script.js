@@ -41,19 +41,42 @@ class CountdownTimer {
     
     updateCurrentTime() {
         const now = new Date();
-        const estTime = now.toLocaleString('en-US', {
-            timeZone: 'America/New_York',
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            second: '2-digit',
-            timeZoneName: 'short'
-        });
         
-        this.elements.localTimeDisplay.textContent = estTime;
+        // Calculate EST/EDT manually to avoid timezone detection issues
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const estOffset = -5; // EST is UTC-5
+        const edtOffset = -4; // EDT is UTC-4
+        
+        // Simple DST calculation (second Sunday in March to first Sunday in November)
+        const year = now.getFullYear();
+        const dstStart = new Date(year, 2, 1); // March 1st
+        dstStart.setDate(dstStart.getDate() + (7 - dstStart.getDay()) + 7); // Second Sunday
+        const dstEnd = new Date(year, 10, 1); // November 1st
+        dstEnd.setDate(dstEnd.getDate() + (7 - dstEnd.getDay())); // First Sunday
+        
+        const isDST = now >= dstStart && now < dstEnd;
+        const offset = isDST ? edtOffset : estOffset;
+        const estTime = new Date(utc + (offset * 3600000));
+        
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        const dayName = days[estTime.getDay()];
+        const monthName = months[estTime.getMonth()];
+        const date = estTime.getDate();
+        const yearNum = estTime.getFullYear();
+        
+        let hours = estTime.getHours();
+        const minutes = estTime.getMinutes().toString().padStart(2, '0');
+        const seconds = estTime.getSeconds().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        
+        const timezone = isDST ? 'EDT' : 'EST';
+        const formattedTime = `${dayName}, ${monthName} ${date}, ${yearNum}, ${hours}:${minutes}:${seconds} ${ampm} ${timezone}`;
+        
+        this.elements.localTimeDisplay.textContent = formattedTime;
     }
     
     getCurrentState() {
