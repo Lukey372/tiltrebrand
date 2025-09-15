@@ -32,27 +32,28 @@ class CountdownTimer {
     }
     
     updateLocalTimezone() {
-        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const openLocal = this.openDate.toLocaleString('en-US', {
-            timeZone: userTimezone,
+        this.updateCurrentTime();
+        // Update time every second
+        setInterval(() => {
+            this.updateCurrentTime();
+        }, 1000);
+    }
+    
+    updateCurrentTime() {
+        const now = new Date();
+        const estTime = now.toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+            weekday: 'short',
             month: 'short',
             day: 'numeric',
             year: 'numeric',
             hour: 'numeric',
             minute: '2-digit',
-            timeZoneName: 'short'
-        });
-        const closeLocal = this.closeDate.toLocaleString('en-US', {
-            timeZone: userTimezone,
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
+            second: '2-digit',
             timeZoneName: 'short'
         });
         
-        this.elements.localTimeDisplay.textContent = `Opens: ${openLocal} | Closes: ${closeLocal}`;
+        this.elements.localTimeDisplay.textContent = estTime;
     }
     
     getCurrentState() {
